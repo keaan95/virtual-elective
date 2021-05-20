@@ -1,0 +1,21 @@
+---
+title: "Exercise 1 - Data Input"
+author: "Keaan Amin"
+date: '`r format(Sys.time(), "%d %b %Y")`'
+output: pdf_document
+---
+
+Grab the data.csv file from the Github Directory (https://github.com/keaan95/virtual-elective/tree/master/Week1) and put it into your Working Directory.
+
+
+# EXERCISE 1
+## 1.1. Add the data file to your ENVIRONMENT.
+TIP - Remember to Set your Working Directory to the location of your data file.
+  
+```{r}
+# You can fetch your WORKING directory as follows
+getwd()
+# Change to your local directory - in my case it is as follows:
+setwd("C:/Users/keaan/OneDrive - Newcastle University/HLA - Virtual Elective/Week1/")
+df <- read.csv("data.csv")
+```

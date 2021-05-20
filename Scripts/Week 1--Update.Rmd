@@ -1,0 +1,563 @@
+---
+title: "Practical Coding Exercises in Machine Learning in R"
+author: "Keaan Amin"
+date: 'Last Modified: 4 January 2021'
+output:
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Purpose of this Series
+
+- Get you to Speed in R [Week 1]
+- Building your First Models in ML [Week 2]
+- Visualise, Improve and Optimise your Models [Week 3]
+- Evaluate how well your Models Compare to Each other [Week 4]
+- Take This Further on Your Own Datasets
+
+## What's R?
+
+- A free language for statistical dataset analysis
+- Enormous graphical capabilities through well-supported packages
+- Interpretative language so commands are typed without requiring to build complete programmes
+- Well-supported and documented modular add-on packages (16,000!) - across Stats, ML and ComputerBio
+- Less learning -> more doing -> more problem-solving.
+
+## How is it different to Excel or stats programmes e.g. SPSS?
+
+![Lots of additional packages and resources to do more computational tasks. Shift through thousands of columns of data, visualise and adapt plots more quickly. Lots more creative capacity](https://iqss.github.io/dss-workshops/R/Rintro/images/R_chain.png)
+
+## How does R work?
+
+![Apply our code as keyboard commands that interact with our workspace. Import data e.g. as txt or csv files that can be exported to use in other programmes. Produce plots.](https://iqss.github.io/dss-workshops/R/Rintro/images/R_works.png)
+
+## Major Uses of R
+
+![test](https://revolution-computing.typepad.com/.a/6a010534b1db25970b0147e0ae51b2970b-800wi){width=30%}
+![test](https://i.ibb.co/V2jDg48/burns-ft-covid-case-trajectory-1.jpg){width=20%}
+![test](https://fivethirtyeight.com/wp-content/uploads/2016/11/morris-durant-1b.png){width=15%}
+![test](https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs42003-020-01172-0/MediaObjects/42003_2020_1172_Fig2_HTML.png){width=15%}
+
+- Social Networks
+- Major News Corporations
+- Sports and Politics
+- Academia
+
+## Machine Learning
+
+![ML](https://t-dab.com/wp-content/uploads/2020/06/classification-of-the-most-common-machine-learning-algorithms2-1024x640.png)
+
+
+## Getting Started [before the session to be completed]
+
+R is a program available on  your computer.
+RStudio is a program that allows to visualise outputs from
+
+1. Install the Latest Base Package of R from below:
+
+http://www.r-project.org/
+
+2. Install Rstudio (if comfortable operating + projecting R plots at the command line - omit this step):
+
+https://rstudio.com/products/rstudio/download/#download
+
+3. Review the Introduction to R Video - Dr Skorupska
+
+
+## Getting Help Once Live
+
+1. Ask R for help
+?help
+
+2. Understanding packages
+?help(package="stats")
+
+3. Using packages
+Online tutorials and Google "package documentation""
+
+4. Troubleshooting
+Google and use StackOverflow.com
+
+
+## R Basics - Data Calculations
+
+We can operate from the command line like a calculator:
+
+```{r}
+5+15
+```
+
+A variable is a letter or word that is assigned a value.
+
+```{r,echo=TRUE}
+x <- 10
+x
+y <- 5
+y
+```
+
+R will automatically add variables of the same type e.g. integers.
+
+```{r,echo=TRUE}
+
+y+x
+```
+
+## Basic Concepts
+
+We can combine variables to form a vector:
+
+```{r,echo=TRUE}
+z <- c("ER","PR","HR")
+z
+```
+
+We can search for a particular value in a vector by sequence number:
+
+```{r,echo=TRUE}
+z[1]
+z[1:3]
+z[-1]
+```
+
+
+We can ask if a particular value is in a vector
+
+```{r, echo=TRUE}
+z=="PR"
+z[z=="PR"]
+```
+
+## Data Structures
+
+Most commonly data is brought into R by txt and csv files:
+
+```{r}
+setwd("C:/Users/keaan/Documents")
+df <- read.csv("data.csv", sep=",",header=T,row.names = 1)
+```
+Lets take a look at the breast data
+
+```{r,echo=TRUE}
+head(df)
+```
+
+SO we have a dataframe but exactly is composed of this?
+
+```{r,echo=TRUE}
+str(df)
+with(df, table(diagnosis))
+```
+
+## ML Data Clean-up
+
+Lets eliminate columns where we have missing data - NA values - commonly occurring
+
+[along the corridor,up the stairs]
+
+```{r,echo=TRUE}
+
+head(is.na(df))
+df <- df[ , colSums(is.na(df)) == 0]
+
+```
+
+We also have to prepare our dataframe as integers for ML.
+
+Firstly, we'll change our factors into a character string.
+
+```{r,echo=TRUE}
+df$diagnosis <- as.character(df$diagnosis)
+```
+
+Instead of just eliminating useful data, let's create a table that contains these descriptive data.
+```{r,echo=TRUE}
+pdata <- df[drop=FALSE,, grep("diagnosis", names(df))]
+pdata$label <- df$diagnosis
+pdata$diagnosis2 <- pdata$diagnosis
+pdata$diagnosis <- ifelse(pdata$diagnosis=="M","Malignant",pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="B","Benign",pdata$diagnosis)
+head(pdata)
+```
+
+And finally, let's prepare our dataframe as integers
+
+```{r,echo=TRUE}
+pdata$diagnosis <- ifelse(pdata$diagnosis=="M",1,pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="B",0,pdata$diagnosis)
+pdata$diagnosis <- as.numeric(pdata$diagnosis)
+```
+
+## Install packages - plotting
+
+```{r,echo=TRUE}
+# install.packages("ggplot2")
+require(ggplot2)
+```
+
+
+## Building our First - Histograms in Base R
+
+- Building graphs in R is like painting a picture.
+- Elements are added one layer at a time + built up in levels
+
+Let's see how our data across looks across one variable e..g perimeter mean
+
+```{r,echo=TRUE}
+head(df)
+hist(df$perimeter_mean)
+hist(df$perimeter_mean,col="purple")
+hist(df$perimeter_mean,col="purple",xlab="Perimeter Mean")
+hist(df$perimeter_mean,col="purple",xlab="Perimeter Mean",main="Distribution of Perimeter")
+```
+
+## Layering Plots using Base R
+
+- We first need to separate our variables into two vectors
+
+```{r, echo=TRUE}
+hist_b <- df$perimeter_mean[df$diagnosis=="B"]
+hist_m <- df$perimeter_mean[df$diagnosis=="M"]
+```
+
+
+## How does this compare across both groups?
+
+- Plot them over each other:
+
+```{r,echo=TRUE}
+
+# First distribution
+plot.new()
+hist(hist_b, breaks=10, xlim=c(0,250), col=rgb(0,0,1,0.5), xlab="Perimeter Mean", 
+     ylab="Density", main="Perimeter Mean across Breast Tissue Types" )
+
+# Second with add=T to plot on top
+hist(hist_m, breaks=10, xlim=c(0,250), col=rgb(1,0,0,0.5), add=T)
+
+# Add legend
+legend("topright", legend=c("Benign","Malignant"), col=c(rgb(0,0,1,0.5), 
+                                                         rgb(1,0,0,0.5)), pt.cex=2, pch=15 )
+
+```
+
+## BONUS Homework
+
+- How can we distinguish between our variables to see which ones help to separate our two groups?
+- We could plot histograms for all our variables or use scatterplots
+- We could alternatively use correlations
+
+
+##Lets figure out our correlations
+
+- First we need a dataframe of pure numbers so lets kick out the diagnosis [we made a pdata and rownames are still intact]
+
+```{r,echo=TRUE}
+dfint <- df[, !(colnames(df) %in% c("diagnosis"))]
+```
+
+- Correlations to two decimal places
+
+```{r,echo=TRUE}
+cormat <- round(cor(dfint),2)
+```
+
+- Let's try out ggplot [a highly adaptable and well-supported graphics package to avoid layering our data + customise plots more easily]
+
+We first need to do some data manipulation - we need all our data correlations into three columns.
+
+```{r,echo=TRUE}
+library(reshape2)
+melted_cormat <- melt(cormat)
+head(melted_cormat)
+```
+
+- Let's make our first correlation plot
+
+```{r,echo=TRUE}
+library(ggplot2)
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile(color = "white")
+```
+
+- Let's add some colours and twist the labels
+
+```{r,echo=TRUE}
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value))+
+  geom_tile(color = "white")+
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+                       name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 12, hjust = 1))+
+  coord_fixed()
+```
+
+- If one or more variables are more correlated, this suggests one is depenent on the other.
+- An algorithm will assume and estimate relationships based on independent variables.
+- Based on the algorithm we selection, we may miss out on dependent details 
+- We are therefore at a risk of overfitting and to avoid this we can remove correlated variables. This may incur further repercussions...
+
+
+## Which variables are more important than the others?
+
+- Computational biology problem with lots of columns [variables]
+- Transform a large set of variables into a smaller set, whilst preserving variability [to distinguish between malignant and benign]
+
+- We can use our clinical knowledge / look at them individually / use feature selection techniques [next week!]
+
+An alternative is to look variables individually. Convert variables collectively into a mathematical function that maximises the variance using uncorrelated variables. We can use eigenvectors [a function to help explain the variation in the data]
+
+The basis of principal component analysis in biological heteroscedastic data. A picture of separability is more difficult to tease out so lets plot one.
+
+```{r,echo=TRUE}
+pcas <- prcomp(dfint,scale=TRUE,center=TRUE)
+str(pcas)
+pcasdf <-data.frame(pcas$x)
+head(pcasdf)
+```
+
+```{r,echo=TRUE}
+require(ggplot2)
+plot.new()
+ggplot(pcasdf,aes(x=PC1,y=PC2,col=pdata$diagnosis))+
+  labs(color = "Subtypes") +
+  geom_point(size=3)
+```
+
+## Week 1 Round-up
+
+- These eigenvector plots are based on sophisticated mathematics but they help to draw a picture of separability confirming our ideas about whether or not we have 'useful data.'
+- The correlations suggest we do have correlated data so we need to exclude / include appropriately to capture the image of variance in the data -> that can be found in future validation datasets.
+- Data filtration, selection and processing is often the most time-consuming step [but one of the most worthwhile] to building a reliable model.
+- We've covered a lot of ground for a Week of programming so work at your own pace!
+
+
+## More dimensionality plots for the extra-keen computer biologists!
+
+```{r,echo=TRUE}
+require(umap)
+umaps <- umap(dfint)
+
+
+umaps$layout <- as.data.frame(umaps$layout)
+umaps$layout$V3 <- rownames(umaps$layout)
+umaps$layout$V4 <- pdata$diagnosis[match(umaps$layout$V3,rownames(pdata))]
+
+plot.new()
+ggplot(umaps$layout,aes(x=V1,y=V2, color=V4)) +
+  geom_point(size=3) +
+  xlab("UMAP 1") +
+  ylab("UMAP 2") +
+  guides(fill=guide_legend(title="Tumour Type"))
+```
+
+
+```{r,echo=TRUE}
+require(Rtsne)
+
+downtsnedata <- Rtsne(df,perplexity = 15)
+downtsnedf <- as.data.frame(downtsnedata$Y)
+rownames(downtsnedf) <- rownames(pdata)
+downtsnedf$V3 <- as.matrix(rownames(downtsnedf))
+downtsnedf$V4 <- pdata$diagnosis[match(downtsnedf$V3,rownames(pdata))]
+
+plot.new()
+ggplot(downtsnedf,aes(x=V1,y=V2, color=V4)) +
+  geom_point(size=4) +
+  guides(fill=guide_legend(title="LRCG Subtypes")) +
+  xlab("TSNE 1") +
+  ylab("TSNE 2")
+```
+
+## Week 2
+
+- Quick Recap of last week
+- Building our first Classification Model
+- Explanations of Various Algorithms at your figure tips!
+
+## Feature Selection
+
+- In other words what varaibles shall we use for our model
+- We can use our expertise / experience as clinicians to pick out what is relevant.
+- We can feature select by mathematical methods [Week 3]
+- We can just take some variables, eyeballed from our correlations plot
+
+```{r,echo=TRUE}
+head(df)
+df_filt <- df[, colnames(df) %in% c("radius_mean","texture_mean","perimeter_mean","area_mean","diagnosis")]
+```
+
+##Automatic Boxplots and Histograms
+
+- Caret is an R package with a library of models - a virtual ToysRus - convienently contains plots as well
+
+```{r,echo=TRUE}
+require(caret)
+plot.new()
+featurePlot(x = df_filt[, 2:5], 
+            y = as.factor(df_filt$diagnosis), 
+            plot = "box",
+            strip=strip.custom(par.strip.text=list(cex=.9)),
+            scales = list(x = list(relation="free"), 
+                          y = list(relation="free")))
+```
+
+
+```{r,echo=TRUE}
+featurePlot(x = df_filt[, 2:5], 
+            y = as.factor(df_filt$diagnosis), 
+            plot = "density",
+            strip=strip.custom(par.strip.text=list(cex=.7)),
+            scales = list(x = list(relation="free"), 
+                          y = list(relation="free")))
+```
+
+## Training and Test Splits with QC
+
+```{r,echo=TRUE}
+# Create the training and test datasets
+set.seed(100)
+library(nnet)
+library("e1071")
+## install.packages("caretEnsemble")
+library(caretEnsemble)
+
+# Step 1: Get row numbers for the training data
+trainRowNumbers <- createDataPartition(df_filt$diagnosis, p=0.8, list=FALSE)
+
+# Step 2: Create the training  dataset
+trainData <- df_filt[trainRowNumbers,]
+
+# Step 3: Create the test dataset
+testData <- df_filt[-trainRowNumbers,]
+
+
+##Lets make Cross-validation 10x as our control
+control <- trainControl(method="cv", number=10)
+
+##Assess performance by ROC
+metric <- "ROC"
+```
+
+##Training our Model
+
+- Lets try random forests
+
+```{r,echo=TRUE}
+set.seed(65)
+results <- train(diagnosis~., data=trainData, method="rf", metric="ROC",
+                 trControl = trainControl(method = "cv", number = 10,classProbs=TRUE,summaryFunction = twoClassSummary, savePredictions = T))
+```
+
+- Let's test out a different models!
+
+```{r,echo=TRUE}
+alg_list <- c("rf", "glm", "gbm", "lda", "rpart", "nnet","svmRadial","knn")
+set.seed(65)
+?caretList
+resultsList <- caretList(diagnosis~ ., data=trainData,methodList = alg_list,metric="ROC",
+          trControl = trainControl(method = "cv", number = 10,classProbs=TRUE,summaryFunction = twoClassSummary,
+                                   savePredictions = T))
+```
+
+## Which model is currently performing the best?
+
+- Practically, as a test-run we've fired many different models
+
+```{r,echo=TRUE}
+resListdata <- resamples(resultsList)
+?resamples
+resListdata$values
+
+dotplot(resListdata)
+```
+
+## How does our best performing model do on validation?
+
+```{r,echo=TRUE}
+predictions <- predict(resultsList$knn,testData)
+results<- confusionMatrix(predictions,as.factor(testData$diagnosis), positive="M")
+```
+
+- Lets save our best performing model
+
+```{r,echo=TRUE}
+saveRDS(resultsList$knn, "breast_cancer_model.RDS")
+```
+
+- We can load this back into R by
+
+```{r,echo=TRUE}
+# getwd()
+# list.files()
+
+bc_model <- readRDS("breast_cancer_model.RDS")
+```
+
+##Week 2 Midway Round-up
+
+- We have  model is performing well but inherently complex.
+- Practically, we would usually start with a simple model - one that can be explainable e.g. a decision tree or by previous evidence-based knowledge, select one to work with.
+- Once we have a simple model, we'll then fine-tune and optimise it [Week 3].
+- We'll also introduce multi-classification problems, making predictions and have a mini-competition in Week 4.
+
+## How can we more easily compare test + validation outputs on all our models?
+
+- Loops help us to do code repeatedly without writing out the code every-time
+
+- In this case, loops can do some code on every value in a vector.
+
+```{r,echo=TRUE}
+numberlist <-1:10
+
+for(i in numberlist){
+  print(i)
+}
+```
+
+- Loop on names in a list
+
+```{r,echo=TRUE}
+names(resultsList)  
+
+for(alg in names(resultsList)){
+  print(alg)
+}
+```
+
+
+- Loop on names in a list and put it into a new list
+
+predictionsList <- list()
+confusionMatrixList <- list()
+
+for (alg in names(resultsList)) {
+  predictionsList[[alg]] <- predict(resultsList[[alg]],testData)
+  confusionMatrixList[[alg]] <- confusionMatrix(predictionsList[[alg]],as.factor(testData$diagnosis), positive="M")
+  print(alg)
+}
+
+```{r,echo=TRUE}
+# predictionsList$svmRadial
+# confusionMatrixList$svmRadial
+# confusionMatrixList$svmRadial$byClass
+```
+
+
+##Bonus Week 2 Homework
+
+- Lets compare + plot the performance on test + validation across all our models. A hint is below
+
+```{r,echo=TRUE}
+# as.data.frame(confusionMatrixList$svmRadial$byClass)
+```
+
+- Fancy creating an Ensembl? Models on Models?
+
+https://cran.r-project.org/web/packages/caretEnsemble/vignettes/caretEnsemble-intro.html

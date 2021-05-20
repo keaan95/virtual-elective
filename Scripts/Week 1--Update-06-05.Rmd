@@ -1,0 +1,279 @@
+---
+title: "Practical Coding Exercises in Machine Learning in R"
+author: "Keaan Amin"
+date: 'Last Modified: 6th May 2021'
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Purpose of this Series
+
+- Learn Basic Functions in R [Week 1]
+- Building your First Models in ML [Week 2]
+- Visualise, Improve and Optimise your Models [Week 3]
+- Develop Models on New Data Top to Toe [Week 4]
+
+
+## Getting Started [before the session to be completed]
+
+R is a program available on  your computer.
+RStudio is a program that allows to visualise outputs from
+
+1. Install the Latest Base Package of R from below:
+
+http://www.r-project.org/
+
+2. Install Rstudio (if comfortable operating + projecting R plots at the command line - omit this step):
+
+https://rstudio.com/products/rstudio/download/#download
+
+3. Review the Introduction to R Video - Dr Skorupska
+
+## Getting Help Once Live
+
+1. Ask Google - Stackoverflow - lots of solutions
+
+2. Ask R for help
+?help(package="stats")
+
+3. Package Documentation - Google
+
+4. Google and use StackOverflow.com
+
+## What's R?
+
+- A free language for statistical dataset analysis
+- Enormous graphical capabilities through well-supported packages
+- Interpretative language so commands are typed without requiring to build complete programmes
+- Well-supported and documented modular add-on packages (16,000!) - across Stats, ML and ComputerBio
+- Less learning -> more doing -> more problem-solving.
+
+## How is it different to Excel or stats programmes e.g. SPSS?
+
+![Lots of additional packages and resources to do more computational tasks. Shift through thousands of columns of data, visualise and adapt plots more quickly. Lots more creative capacity](https://iqss.github.io/dss-workshops/R/Rintro/images/R_chain.png)
+
+## How does R work?
+
+![Apply our code as keyboard commands that interact with our workspace. Import data e.g. as txt or csv files that can be exported to use in other programmes. Produce plots.](https://iqss.github.io/dss-workshops/R/Rintro/images/R_works.png)
+
+## Major Uses of R
+
+![test](https://revolution-computing.typepad.com/.a/6a010534b1db25970b0147e0ae51b2970b-800wi){width=30%}
+![test](https://i.ibb.co/V2jDg48/burns-ft-covid-case-trajectory-1.jpg){width=20%}
+![test](https://fivethirtyeight.com/wp-content/uploads/2016/11/morris-durant-1b.png){width=15%}
+![test](https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs42003-020-01172-0/MediaObjects/42003_2020_1172_Fig2_HTML.png){width=15%}
+
+- Social Networks
+- Major News Corporations
+- Sports and Politics
+- Academia
+
+## Machine Learning
+
+![ML](https://t-dab.com/wp-content/uploads/2020/06/classification-of-the-most-common-machine-learning-algorithms2-1024x640.png)
+
+## Install Packages
+
+```{r,echo=TRUE}
+# hashtags(#) denote a comment
+# install.packages("caret")
+# install.packages("ggplot2")
+```
+
+Load in our packages
+
+```{r,echo=TRUE}
+# library(ggplot2)
+```
+
+## Exercise 1 - Data Structures
+
+Most commonly data is brought into R by txt and csv files:
+
+```{r,echo=TRUE}
+# You can fetch your WORKING directory as follows
+getwd()
+# Change to your local directory - in my case it is as follows:
+setwd("C:/Users/keaan/OneDrive - Newcastle University/HLA - Virtual Elective/Week1/")
+df <- read.csv("data.csv", sep=",",header=T,row.names = 1)
+```
+## Whistle stop syntax
+
+We can operate from the command line like a calculator:
+
+```{r,echo=TRUE}
+5+15
+```
+
+A *variable* is a letter or word that is assigned a value.
+
+```{r,echo=TRUE}
+x <- 10
+x
+y <- 5
+y
+```
+
+R will automatically add variables of the same type e.g. integers.
+
+```{r,echo=TRUE}
+
+y+x
+```
+
+## Whistle stop Syntax
+
+We can combine variables, in this characters to form a string:
+
+```{r,echo=TRUE}
+z <- c("ER","PR","HR")
+z
+```
+
+Essentially, a series of strings make an object and our object is df [dataframe]. In other words, strings make up columns.
+
+## Search in a String / Column
+
+We can search for a particular value in a string by sequence number:
+
+```{r,echo=TRUE}
+z[1]
+z[1:3]
+z[-1]
+```
+
+We can ask if a particular value is in a string
+
+```{r, echo=TRUE}
+z=="PR"
+z[z=="PR"]
+```
+
+## EXERCISE 2.1 - Data visualisation
+
+Lets take a look at the breast data
+
+```{r,echo=TRUE}
+head(df)
+df[1:5,1:5]
+```
+
+SO we have a dataframe but exactly is composed of this?
+
+```{r,echo=TRUE}
+str(df)
+with(df, table(diagnosis))
+```
+
+
+## EXERCISE 2.2
+
+1. How many patients are in the data?
+
+## EXERCISE 2.2
+
+```{r,echo=TRUE}
+nrow(df)
+```
+
+
+## EXERCISE 2.3 - Scatterplots
+
+Let’s Plot Radius against Perimeter Means of Our Patients
+
+## EXERCISE 2.3
+
+- Building graphs in R is like painting a picture.
+- Elements are added one layer at a time + built up in levels
+
+```{r,echo=TRUE}
+plot(df$radius_mean,df$texture_mean)
+```
+
+```{r,echo=TRUE}
+plot(df$radius_mean,df$texture_mean,
+col=as.factor(df$diagnosis),
+xlab="Radius Means",
+ylab="Texture Means",
+main="Breast Cancer Patients of Radius against Texture Means")
+legend("topright",legend = c("M", "B"), pch=c(1,1), col=c("red","black"))
+```
+
+
+## Building our First - Histograms in Base R
+
+Let's see how our data across looks across one variable e..g perimeter mean
+
+```{r,echo=TRUE}
+hist(df$perimeter_mean)
+hist(df$perimeter_mean,col="purple")
+hist(df$perimeter_mean,col="purple",xlab="Perimeter Mean")
+hist(df$perimeter_mean,col="purple",xlab="Perimeter Mean",main="Distribution of Perimeter")
+```
+
+## Layering Plots using Base R
+
+- We first need to separate our variables into two strings
+
+```{r, echo=TRUE}
+hist_b <- df$perimeter_mean[df$diagnosis=="B"]
+hist_m <- df$perimeter_mean[df$diagnosis=="M"]
+```
+
+
+## How does this compare across both groups?
+
+- Plot them over each other to create separation [don't copy this!]
+
+```{r,echo=TRUE}
+
+# First distribution
+plot.new()
+hist(hist_b, breaks=10, xlim=c(0,250), col=rgb(0,0,1,0.5), xlab="Perimeter Mean", 
+     ylab="Density", main="Perimeter Mean across Breast Tissue Types" )
+
+# Second with add=T to plot on top
+hist(hist_m, breaks=10, xlim=c(0,250), col=rgb(1,0,0,0.5), add=T)
+
+# Add legend
+legend("topright", legend=c("Benign","Malignant"), col=c(rgb(0,0,1,0.5), 
+                                                         rgb(1,0,0,0.5)), pt.cex=2, pch=15 )
+
+```
+
+## How can we simplify plot making?
+
+- Packages!
+
+```{r, echo=TRUE}
+library("ggplot2")
+```
+
+
+## Problems for Next Week!
+
+- How can we distinguish between our variables to see which ones help to separate our two groups?
+- What plots would you like to build to help us choose variables for our models?
+
+
+## Next Week
+
+- Further reading - caret (machine learning package) - http://www.rebeccabarter.com/blog/2017-11-17-caret_tutorial/, ggplot2 (graphical images package) - http://r-statistics.co/Complete-Ggplot2-Tutorial-Part1-With-R-Code.html, 
+- Shall release Week 2 Mini-Exercises this weekend - feature selection [step 1 of building our models!]
+- No Formal Coding Homework for Week 1!
+
+
+
+## Summary
+
+Thank you for coming along!
+
+https://forms.office.com/Pages/ResponsePage.aspx?id=yRJQnBa2wkSpF2aBT74-h4_904xzEU1Hr6_KZJuPREVUQlREUFpLSUNESTRWTEVUSTgyTEk3WjRITS4u
+
+Really would appreciate your feedback!

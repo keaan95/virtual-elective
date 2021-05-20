@@ -1,0 +1,78 @@
+---
+title: "Exercise 2 - Data Visualisation"
+author: "Keaan Amin"
+date: '`r format(Sys.time(), "%d %b %Y")`'
+output: pdf_document
+---
+
+Grab the data.csv file from the Github Directory (https://github.com/keaan95/virtual-elective/tree/master/Week1) and put it into your Working Directory.
+
+
+# EXERCISE 1
+## 1.1. Add the data file to your ENVIRONMENT.
+TIP - Remember to Set your Working Directory to the location of your data file.
+  
+```{r}
+# You can fetch your WORKING directory as follows
+getwd()
+# Change to your local directory - in my case it is as follows:
+setwd("C:/Users/keaan/OneDrive - Newcastle University/HLA - Virtual Elective/Week1/")
+df <- read.csv("data.csv")
+```
+
+# EXERCISE 2
+## 2.1. Visualise the first five columns and rows.
+
+```{r}
+df[1:5,1:5]
+```
+
+## 2.2. How many patients are in the data?
+
+```{r,eval=FALSE}
+nrow (df)
+```
+
+## 2.3. Let's Plot Radius against Perimeter Means of Our Patients
+
+```{r}
+plot(df$radius_mean,df$texture_mean,
+     xlab="Ex")
+```
+
+## 2.3. Let's Add some Legends and a Title
+
+```{r}
+plot(df$radius_mean,df$texture_mean,
+     xlab="Radius Means",
+     ylab="Texture Means",
+     main="Breast Cancer Patients of Radius against Texture Means")
+```
+
+
+## 2.4. Let's Colour By Malignant vs. Benign Patients
+
+In order to do this we need to change our column 'data type'
+
+```{r,eval=FALSE}
+# View the data type of structures of our dataframe 'df'
+str(df)
+```
+
+Our 'df$diagnosis' are a bunch of  'M's or 'B's - known as 'characters.' We need this data type to be a 'factor' so R recognises it belongs to a particular group. We can do this by:
+
+```{r,eval=FALSE}
+as.factor(df$diagnosis)
+```
+
+Using the col variable, we can specify this:
+
+```{r}
+plot(df$radius_mean,df$texture_mean,
+     col=as.factor(df$diagnosis),
+     xlab="Radius Means",
+     ylab="Texture Means",
+     main="Breast Cancer Patients of Radius against Texture Means")
+legend("topright",legend = c("M", "B"), pch=c(1,1), col=c("red","black"))
+```
+

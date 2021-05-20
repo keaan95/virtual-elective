@@ -1,0 +1,215 @@
+---
+title: "Practical Coding Exercises in Machine Learning in R"
+author: "Keaan Amin"
+date: "Last Modified: 4 January 2021"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Purpose of this Series
+
+- Get you to Speed in R [Week 1]
+- Building your First Models in ML [Week 2]
+- Visualise, Improve and Optimise your Models [Week 3]
+- Evaluate how well your Models Compare to Each other [Week 4]
+- Take This Further on Your Own Datasets
+
+## What's R?
+
+- A free language for statistical dataset analysis
+- Enormous graphical capabilities through well-supported packages
+- Interpretative language so commands are typed without requiring to build complete programmes
+- Well-supported and documented modular add-on packages (16,000!) - across Stats, ML and ComputerBio
+- Less learning -> more doing -> more problem-solving.
+
+## How is it different to Excel or stats programmes e.g. SPSS?
+
+![Lots of additional packages and resources to do more computational tasks. Shift through thousands of columns of data, visualise and adapt plots more quickly. Lots more creative capacity](https://iqss.github.io/dss-workshops/R/Rintro/images/R_chain.png)
+
+## How does R work?
+
+![Apply our code as keyboard commands that interact with our workspace. Import data e.g. as txt or csv files that can be exported to use in other programmes. Produce plots.](https://iqss.github.io/dss-workshops/R/Rintro/images/R_works.png)
+
+## Major Uses of R
+
+![test](https://revolution-computing.typepad.com/.a/6a010534b1db25970b0147e0ae51b2970b-800wi){width=30%}
+![test](https://i.ibb.co/V2jDg48/burns-ft-covid-case-trajectory-1.jpg){width=20%}
+![test](https://fivethirtyeight.com/wp-content/uploads/2016/11/morris-durant-1b.png){width=15%}
+![test](https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs42003-020-01172-0/MediaObjects/42003_2020_1172_Fig2_HTML.png){width=15%}
+
+- Social Networks
+- Major News Corporations
+- Sports and Politics
+- Academia
+
+## Machine Learning
+
+![ML](https://t-dab.com/wp-content/uploads/2020/06/classification-of-the-most-common-machine-learning-algorithms2-1024x640.png)
+
+
+## Getting Started [before the session to be completed]
+
+R is a program available on  your computer.
+RStudio is a program that allows to visualise outputs from
+
+1. Install the Latest Base Package of R from below:
+
+http://www.r-project.org/
+
+2. Install Rstudio (if comfortable operating + projecting R plots at the command line - omit this step):
+
+https://rstudio.com/products/rstudio/download/#download
+
+
+## Getting Help Once Live
+
+1. Ask R for help
+?help
+
+2. Understanding packages
+?help(package="stats")
+
+3. Using packages
+Online tutorials and Google "package documentation""
+
+4. Troubleshooting
+Google and use StackOverflow.com
+
+
+## Basic Calculations
+
+We can operate from the command line like a calculator:
+
+```{r}
+5+15
+```
+
+A variable is a letter or word that is assigned a value.
+
+```{r,echo=TRUE}
+x <- 10
+x
+y <- 5
+y
+```
+
+R will automatically add variables of the same type e.g. integers.
+
+```{r,echo=TRUE}
+
+y+x
+```
+
+## Basic Concepts
+
+We can combine variables to form a vector:
+
+```{r,echo=TRUE}
+z <- c("ER","PR","HR")
+z
+```
+
+We can search for a particular value in a vector by sequence number:
+
+```{r,echo=TRUE}
+z[1]
+z[1:3]
+z[-1]
+```
+
+
+We can ask if a particular value is in a vector
+
+```{r, echo=TRUE}
+z=="PR"
+z[z=="PR"]
+```
+
+## Data Structures
+
+Most commonly data is brought into R by txt and csv files:
+
+```{r}
+setwd("C:/Users/keaan/Documents")
+df <- read.csv("data.csv", sep=",",header=T,row.names = 1)
+```
+Lets take a look at the breast data
+
+```{r,echo=TRUE}
+head(df)
+```
+
+SO we have a dataframe but exactly is composed of this?
+
+```{r,echo=TRUE}
+str(df)
+with(df, table(diagnosis))
+```
+
+## ML Data Clean-up
+
+Lets eliminate columns where we have missing data.
+
+[along the corridor,up the stairs]
+
+```{r,echo=TRUE}
+
+df <- df[ , colSums(is.na(df)) == 0]
+
+```
+
+We also have to prepare our dataframe as integers for ML.
+
+Firstly, we'll change our factors into a character string.
+
+```{r,echo=TRUE}
+df$diagnosis <- as.character(df$diagnosis)
+```
+
+Instead of just eliminating useful data, let's create a table that contains these descriptive data.
+```{r,echo=TRUE}
+pdata <- df[drop=FALSE,, grep("diagnosis", names(df))]
+head(pdata)
+pdata$label <- df$diagnosis
+pdata$diagnosis2 <- pdata$diagnosis
+pdata$diagnosis <- ifelse(pdata$diagnosis=="M","Malignant",pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="B","Benign",pdata$diagnosis)
+head(pdata)
+```
+
+And finally, let's prepare our dataframe as integers
+
+```{r,echo=TRUE}
+pdata$diagnosis <- ifelse(pdata$diagnosis=="M",1,pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="B",0,pdata$diagnosis)
+pdata$diagnosis <- as.numeric(pdata$diagnosis)
+```
+
+## Install packages - plotting
+
+```{r,echo=TRUE}
+# install.packages("ggplot2")
+require(ggplot2)
+```
+
+
+## Building our First - Histograms in Base R
+
+- Building graphs in R is like painting a picture.
+- Elements are added one layer at a time + built up in levels
+
+Let's see how our data across looks across one variable e..g perimeter mean
+
+```{r,echo=TRUE}
+hist(df$perimeter_mean)
+hist(df$perimeter_mean,col="purple")
+hist(df$perimeter_mean,col="purple",xlab="Perimeter Mean")
+hist(df$perimeter_mean,col="purple",xlab="Perimeter Mean",main="Distribution of Perimeter")
+```
+
+### How does this compare across both groups?
+
+- As computationally these graphs involve multi-layering which Rknitting does not like - we will move across to Rworksheets.

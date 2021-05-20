@@ -1,0 +1,67 @@
+---
+title: "Week 2"
+author: "Keaan Amin"
+date: "25 January 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+setwd("C:/Users/keaan/Documents")
+df <- read.csv("data.csv", sep=",",header=T,row.names = 1)
+
+###Lets eliminate columns where we have missing data.
+df <- df[ , colSums(is.na(df)) == 0]
+
+###Lets adjust our input of our dataframe into integers - ready for ML
+# So we have factors i.e. a grouped categorical variable that needs to be converted to characters [short strings of text] -> numeric
+# df$diagnosis <- as.character(df$diagnosis)
+
+pdata <- df[drop=FALSE,, grep("diagnosis", names(df))]
+head(pdata)
+pdata$diagnosis <- as.character(pdata$diagnosis)
+pdata$diagnosis2 <- pdata$diagnosis
+pdata$diagnosis <- ifelse(pdata$diagnosis=="M","Malignant",pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="B","Benign",pdata$diagnosis)
+head(pdata)
+
+
+# df$diagnosis <- ifelse(df$diagnosis=="M",1,df$diagnosis)
+# df$diagnosis <- ifelse(df$diagnosis=="B",0,df$diagnosis)
+# df$diagnosis <- as.numeric(df$diagnosis)
+
+
+hist_b <- df$perimeter_mean[df$diagnosis=="B"]
+hist_m <- df$perimeter_mean[df$diagnosis=="M"]
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+
+# First distribution
+plot.new()
+hist(hist_b, breaks=10, xlim=c(0,250), col=rgb(0,0,1,0.5), xlab="Perimeter Mean", 
+     ylab="Density", main="Perimeter Mean across Breast Tissue Types" )
+
+# Second with add=T to plot on top
+hist(hist_m, breaks=10, xlim=c(0,250), col=rgb(1,0,0,0.5), add=T)
+
+# Add legend
+legend("topright", legend=c("Benign","Malignant"), col=c(rgb(0,0,1,0.5), 
+                                                         rgb(1,0,0,0.5)), pt.cex=2, pch=15 )
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

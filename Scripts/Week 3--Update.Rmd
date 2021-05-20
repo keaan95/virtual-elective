@@ -1,0 +1,196 @@
+---
+title: "Week 3"
+author: "Keaan Amin"
+date: "20 February 2021"
+output:
+  slidy_presentation: default
+  ioslides_presentation: default
+---
+
+## Welcome Back
+
+- R Basics and Graphical projection [Week 1]
+- Building our Classification Models top to toe [Week 2]
+- Looping, Statistical Testing [Week 2]
+
+## This Week
+
+- Can we Classify Liver Disease Patients using Blood Test Results.
+- Optimise models - hyperparameters.
+- What further cross-validation methods might be of added benefit.
+
+## Setup
+
+
+```{r setup, include=FALSE, echo=FALSE}
+setwd("C:/Users/keaan/Documents")
+df <- read.csv("indian_liver_patient.csv", sep=",",header=T)
+```
+
+
+Lets take a look at the breast data
+
+```{r,echo=TRUE}
+head(df)
+df <- df[ , colSums(is.na(df)) == 0]
+pdata <- df[drop=FALSE,,colnames(df) %in% c("Age","Gender","Dataset")]
+```
+
+
+##Phenotypic Data
+
+- Power of what we know is in the phenotype.
+
+```{r,echo=TRUE}
+pdata$diagnosis <- as.character(df$Dataset)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="1","Disease",pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="2","Normal",pdata$diagnosis)
+head(pdata)
+
+###dataset of just integers and without pdata
+dfint <- df[,!colnames(df) %in% c("Age","Gender","Dataset")]
+```
+
+
+##Data Processing
+
+- Can we project anything to suggest that our data might separate the two groups
+
+```{r,echo=TRUE}
+cormat <- round(cor(dfint),2)
+
+library(reshape2)
+melted_cormat <- melt(cormat)
+head(melted_cormat)
+
+library(ggplot2)
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value))+
+  geom_tile(color = "white")+
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab", 
+                       name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 12, hjust = 1))+
+  coord_fixed()
+```
+
+- It appears that we have some correlated variables, consistent with what we expected.
+- Important to capture both as to avoid not keeping dependent details to explain variability in the two groups
+
+##BONUS - Principal Components
+
+
+```{r,echo=TRUE}
+pcas <- prcomp(dfint,scale=TRUE,center=TRUE)
+str(pcas)
+pcasdf <-data.frame(pcas$x)
+head(pcasdf)
+
+require(ggplot2)
+ggplot(pcasdf,aes(x=PC1,y=PC2,col=pdata$diagnosis))+
+  labs(color = "Subtypes") +
+  geom_point(size=3)
+```
+
+- As perhaps expected there appears to be a greater amount of variance in our diseased samples.
+- As suggested here, the differences in many samples are no clear. May well be the plot itself not providing enough resolution on these two axes.
+- Let's still go ahead and see.
+
+##Lets plot the differences across our variables
+
+```{r,echo=TRUE}
+df_filt <- df[, colnames(df) %in% c("Direct_Bilirubin","Total_Bilirubin","Alkaline_Phosphotase","Alamine_Aminotransferase","Aspartate_Aminotransferase","Total_Protiens",
+                                    "Albumin")]
+df_filt$diagnosis <- pdata$diagnosis
+require(caret)
+plot.new()
+
+featurePlot(x = df_filt[, 1:7], 
+            y = as.factor(pdata$diagnosis), 
+            plot = "box",
+            strip=strip.custom(par.strip.text=list(cex=.9)),
+            scales = list(x = list(relation="free"), 
+                          y = list(relation="free")))
+
+```
+
+## Create our Datasets
+
+```{r}
+# Create the training and test datasets
+set.seed(100)
+library(nnet)
+require("e1071")
+## install.packages("caretEnsemble")
+require(caretEnsemble)
+
+# Step 1: Get row numbers for the training data
+trainRowNumbers <- createDataPartition(pdata$Dataset, p=0.8, list=FALSE)
+
+# Step 2: Create the training  dataset
+trainData <- df_filt[trainRowNumbers,]
+
+# Step 3: Create the test dataset
+testData <- df_filt[-trainRowNumbers,]
+```
+
+
+```{r}
+##Lets make Cross-validation 10x as our control
+control <- trainControl(method="cv", number=10)
+
+##Assess performance by ROC
+metric <- "ROC"
+```
+
+
+## Lets Train and Test
+
+```{r,echo=TRUE}
+set.seed(65)
+results <- train(diagnosis~., data=trainData, method="rf", metric="ROC",
+                 trControl = trainControl(method = "cv", number = 10,classProbs=TRUE,summaryFunction = twoClassSummary, savePredictions = T))
+
+## Lets evaluate more than one model
+alg_list <- c("rf", "glm", "gbm", "lda", "rpart", "nnet","svmRadial","knn")
+set.seed(65)
+?caretList
+resultsList <- caretList(diagnosis~ ., data=trainData,methodList = alg_list,metric="ROC",
+          trControl = trainControl(method = "cv", number = 10,classProbs=TRUE,summaryFunction = twoClassSummary,
+                                   savePredictions = T))
+```
+
+```{r,echo=TRUE}
+resListdata <- resamples(resultsList)
+?resamples
+resListdata$values
+
+dotplot(resListdata)
+
+## Lets see how our best performing model does on validation.
+predictions <- predict(resultsList$glm,testData)
+results<- confusionMatrix(predictions,as.factor(testData$diagnosis), positive="Disease")
+```
+
+
+
+## Lets save our best performing model
+```{r}
+saveRDS(resultsList$glm, "liver_disease_model.RDS")
+```
+
+- We can load this back into R by
+
+```{r}
+getwd()
+list.files()
+
+liver_model <- readRDS("liver_disease_model.RDS")
+```
+
+
+## How can we improve what we have?
+
+- More Aggressive Feature Selection [can we capture what we have from less and how can we weight that]
+- Tuning our Parameters [Grid searching, Random searching, Bayesian testing, advanced mathematical functioning]

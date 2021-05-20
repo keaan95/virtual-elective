@@ -1,0 +1,57 @@
+---
+title: "Week 3"
+author: "Keaan Amin"
+date: "27th January 2021"
+output: ioslides_presentation
+---
+
+```{r setup, include=TRUE}
+setwd("C:/Users/keaan/Documents")
+df <- read.csv("indian_liver_patient.csv", sep=",",header=T)
+
+###Lets eliminate columns where we have missing data.
+df <- df[ , colSums(is.na(df)) == 0]
+
+
+
+###eliminate columns that we do not need
+# df <- df[,!colnames(df) %in% c("Dataset")]
+
+
+###pdata create
+
+pdata <- df[,colnames(df) %in% c("Age","Gender","Dataset")]
+pdata$diagnosis <- as.character(pdata$Dataset)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="1","Disease",pdata$diagnosis)
+pdata$diagnosis <- ifelse(pdata$diagnosis=="2","Normal",pdata$diagnosis)
+head(pdata)
+
+###dataset of just integers and without pdata
+dfint <- df[,!colnames(df) %in% c("Age","Gender","Dataset")]
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+
+
+## Data Structures
+
+Most commonly data is brought into R by txt and csv files:
+
+```{r}
+setwd("C:/Users/keaan/Documents")
+df <- read.csv("data.csv", sep=",",header=T,row.names = 1)
+```
+Lets take a look at the breast data
+
+```{r,echo=TRUE}
+head(df)
+```
+
+SO we have a dataframe but exactly is composed of this?
+
+```{r,echo=TRUE}
+str(df)
+with(df, table(diagnosis))
