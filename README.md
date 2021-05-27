@@ -48,7 +48,7 @@ Week 3 of our Machine Learning Course in R takes students through blood results 
 ### Week 4 Outcomes
 Week 4 of our Machine Learning Course in R lets students build their own stepwise model to a clinical problem. Using all the skills learnt above, can they apply it to a dataset and reliably produce their own model. We'll then compare outputs across all students and finally against the outcomes of a paper in modern literature.
 
-https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/s12911-020-1023-5#ref-CR52
+https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/s12911-020-1023-5
 
 - **Week 4 Post-Event Feedback** is [here](https://forms.office.com/Pages/ResponsePage.aspx?id=yRJQnBa2wkSpF2aBT74-h4_904xzEU1Hr6_KZJuPREVUQlREUFpLSUNESTRWTEVUSTgyTEk3WjRITS4u).
 This really helps improve for future events.
