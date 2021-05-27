@@ -52,9 +52,3 @@ https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/s12911-020-1023-
 
 - **Week 4 Post-Event Feedback** is [here](https://forms.office.com/Pages/ResponsePage.aspx?id=yRJQnBa2wkSpF2aBT74-h4_904xzEU1Hr6_KZJuPREVUQlREUFpLSUNESTRWTEVUSTgyTEk3WjRITS4u).
 This really helps improve for future events.
-
-
-I am currently hunting down the raw data for a couple of chosen papers:
-
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6894458/
-https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1003149
